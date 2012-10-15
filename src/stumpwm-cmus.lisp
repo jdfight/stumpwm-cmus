@@ -29,6 +29,7 @@
 ;;; surfaw, cmus, cmus-remote
 
 ;;; USAGE:
+;;; Put it in your stumpwm contrib directory and then...
 ;;; (load-module "stumpwm-cmus")
 ;;;
 ;;; ...in your ~/.stumpwmrc, followed by some keybindings (according
