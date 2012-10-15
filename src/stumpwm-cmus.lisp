@@ -59,8 +59,6 @@
 ;;;  (define-key *root-map* (kbd "C-M-l") "cmus-lyrics")
 
 ;;; Code:
-(in-package :stumpwm)
-
 (setf *cmus-commands* '( :PLAY "play" :PAUSE "pause" :STOP "stop" 
                        :NEXT "next" :PREV "prev" :FILE "file" :REPEAT "repeat" 
                        :SHUFFLE "shuffle" :VOLUME "volume" :CLEAR "clear" :RAW "raw"))
