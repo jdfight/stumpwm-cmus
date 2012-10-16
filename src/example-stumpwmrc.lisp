@@ -1,7 +1,15 @@
+
 (in-package :stumpwm)
 
+;; I don't really want to be constantly typing "concatenate 'string" 
+;; this simplifies things.
+;; Thanks to sabetts of #stumpwm
+(defun cat (&rest strings) 
+   "Concatenates strings"
+   (apply 'concatenate 'string strings))
+
 ;; My custom module for interacting with cmus... a work in progress.
-(load-module "stumpwm-cmus")
+(load "/path/to/your/stumpwm-cmus.lisp")
 
 (set-contrib-dir "$HOME/sources/stumpwm/contrib")
 (set-prefix-key (kbd "F20"))
@@ -28,13 +36,6 @@
 (setf weather "weather -f -i ktpa -c tampa -s fl")
 (setf browser "x-www-browser")
 (setf search-provider "https://duckduckgo.com/?q=")
-
-;; I don't really want to be constantly typing "concatenate 'string" 
-;; this simplifies things.
-;; Thanks to sabetts of #stumpwm
-(defun cat (&rest strings) 
-   "Concatenates strings"
-   (apply 'concatenate 'string strings))
 
 (defun exit()
 	(if (= initrc 1) run-commands "quit"))
@@ -142,9 +143,11 @@
   (1 t nil :class "URxvt")
   (1 t nil :class "Pcmanfm")
   (1 t t :role "gimp-toolbox")
+
   (2 t t :class "URxvt" :title "cmus")
   (2 t t :title "Downloads")
   (2 t t :role "gimp-dock")
+
   (3 t t :title "xine Panel"))
 
 (run-shell-command clear_mod)

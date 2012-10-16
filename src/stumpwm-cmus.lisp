@@ -30,7 +30,7 @@
 
 ;;; USAGE:
 ;;; Put it in your stumpwm contrib directory and then...
-;;; (load-module "stumpwm-cmus")
+;;; (load "/path/to/your/stumpwm-cmus.lisp")
 ;;;
 ;;; ...in your ~/.stumpwmrc, followed by some keybindings (according
 ;;; to your preference)
@@ -59,11 +59,22 @@
 ;;;  (define-key *root-map* (kbd "C-M-l") "cmus-lyrics")
 
 ;;; Code:
-(setf *cmus-commands* '( :PLAY "play" :PAUSE "pause" :STOP "stop" 
+;;; Thanks to Diogo F. S. Ramos for helping me get this into a proper package.
+(defpackage #:cmus
+  (:use #:cl)
+  (:export :cat
+           :cmus-control
+           :*cmus-commands*
+           :*cmus-playlist-directory*
+           :query-cmus))
+
+(in-package #:cmus)
+
+(defparameter *cmus-commands* '( :PLAY "play" :PAUSE "pause" :STOP "stop" 
                        :NEXT "next" :PREV "prev" :FILE "file" :REPEAT "repeat" 
                        :SHUFFLE "shuffle" :VOLUME "volume" :CLEAR "clear" :RAW "raw"))
 
-(setf *cmus-playlist-directory* "~/.cmus/")
+(defparameter *cmus-playlist-directory* "~/.cmus/")
 
 ;; Thanks to sabetts of #stumpwm
 (defun cat (&rest strings) 
@@ -73,80 +84,82 @@
 (defun query-cmus (tag)
    "Queries active cmus play session for matching tag"
    (let ((cmus-command "cmus-remote -Q | grep 'tag ") cmus-result)
-     (setf cmus-result (run-shell-command (cat cmus-command tag " '") t))
+     (setf cmus-result (stumpwm:run-shell-command (cat cmus-command tag " '") t))
      (string-trim '(#\Newline) (string-left-trim (cat "tag " tag) cmus-result))))
 
 (defun cmus-control (command)
    "sends a command to cmus via cmus-remote"
-   (run-shell-command (cat "cmus-remote " command)))
+   (stumpwm:run-shell-command (cat "cmus-remote " command)))
+
+(in-package :stumpwm)
 
 (defcommand cmus-send (command) ((:string "Enter Command: "))
    "Send control commands to cmus."
-     (dolist (com *cmus-commands*)
+     (dolist (com cmus:*cmus-commands*)
        (if (equal command com)
-           (cmus-control (cat "--" com)))))
+           (cmus:cmus-control (cmus:cat "--" com)))))
       
 (defcommand cmus-video () ()
    "Find videos on youtube matching currently playing song in cmus"
-   ( run-shell-command (cat "surfraw youtube " 
-                            (query-cmus "artist") 
-                            (query-cmus "title"))))
+   ( stumpwm:run-shell-command (cmus:cat "surfraw youtube " 
+                            (cmus:query-cmus "artist") 
+                            (cmus:query-cmus "title"))))
 
 (defcommand cmus-artist-video () ()
    "Find videos on youtube matching current artist in cmus"
-   (run-shell-command (cat "surfraw youtube " 
-                            (query-cmus "artist"))))
+   ( stumpwm:run-shell-command (cmus:cat "surfraw youtube " 
+                            (cmus:query-cmus "artist"))))
 
 (defcommand cmus-artist-wiki () ()
    "Search wikipedia for current artist in cmus"
-    (run-shell-command (cat "surfraw wikipedia " 
-                            (query-cmus "artist"))))
+    ( stumpwm:run-shell-command (cmus:cat "surfraw wikipedia " 
+                            (cmus:query-cmus "artist"))))
 
 (defcommand cmus-lyrics () ()
    "Search wikipedia for current artist in cmus"
-    (run-shell-command (cat "surfraw google  " 
-                            (query-cmus "artist") 
+    ( stumpwm:run-shell-command (cmus:cat "surfraw google  " 
+                            (cmus:query-cmus "artist") 
                             " " 
-                            (query-cmus "title")
+                            (cmus:query-cmus "title")
                             " lyrics")))
 
 (defcommand cmus-load-playlist (playlist) ((:string "Enter Filename: "))
    "Loads and plays a  playlist from the *cmus-playlist-directory*"
-   (let ((full-path (cat *cmus-playlist-directory* playlist)))
-     (cmus-control "--clear")
-     (cmus-control (cat "-p " full-path))
+   (let ((full-path (cmus:cat *cmus-playlist-directory* playlist)))
+     (cmus:cmus-control "--clear")
+     (cmus:cmus-control (cmus:cat "-p " full-path))
      ;; next ensures that the currently playing cmus track is cleared.
-     (cmus-control "--next")))
+     (cmus:cmus-control "--next")))
 
 (defcommand cmus-search-library (tag) ((:string "Enter Search: "))
   "search library view for tag. "
- (cmus-control "--raw 'view tree'")
- (cmus-control (cat "--raw ' /" tag "'")))
+ (cmus:cmus-control "--raw 'view tree'")
+ (cmus:cmus-control (cmus:cat "--raw ' /" tag "'")))
 
 (defcommand cmus-play-album (tag) ((:string "Enter Search: "))
   "Search and play album matching tag"
-  (cmus-control "--raw 'view tree'")
-  (cmus-control (cat "--raw ' /" tag "'"))
-  (cmus-control "--clear")
-  (cmus-control "--raw win-add-p")
-  (cmus-control "--next")
-  (cmus-control "--raw 'view playlist'")
-  (cmus-control "--play"))
+  (cmus:cmus-control "--raw 'view tree'")
+  (cmus:cmus-control (cmus:cat "--raw ' /" tag "'"))
+  (cmus:cmus-control "--clear")
+  (cmus:cmus-control "--raw win-add-p")
+  (cmus:cmus-control "--next")
+  (cmus:cmus-control "--raw 'view playlist'")
+  (cmus:cmus-control "--play"))
 
 (defcommand cmus-play-song (tag) ((:string "Enter Search: "))
   "Search and play song matching tag"
-  (cmus-control "--raw 'view tree'")
-  (cmus-control (cat "--raw ' /" tag "'"))
-  (cmus-control "--clear")
-  (cmus-control "--raw win-next")
-  (cmus-control "--raw win-add-p")
-  (cmus-control "--next")
-  (cmus-control "--raw 'view playlist'")
-  (cmus-control "--play"))
+  (cmus:cmus-control "--raw 'view tree'")
+  (cmus:cmus-control (cmus:cat "--raw ' /" tag "'"))
+  (cmus:cmus-control "--clear")
+  (cmus:cmus-control "--raw win-next")
+  (cmus:cmus-control "--raw win-add-p")
+  (cmus:cmus-control "--next")
+  (cmus:cmus-control "--raw 'view playlist'")
+  (cmus:cmus-control "--play"))
 
 (defcommand cmus-info () ()
    "Print cmus info to screen"
-   (let ((title  (query-cmus "title")) (artist  (query-cmus "artist")) (album (query-cmus "album"))) 
-        (echo-string (current-screen) (cat "Now Playing: " '(#\NewLine) artist ": " title ": " album))))
+   (let ((title  (cmus:query-cmus "title")) (artist  (cmus:query-cmus "artist")) (album (cmus:query-cmus "album"))) 
+        (echo-string (current-screen) (cmus:cat "Now Playing: " '(#\NewLine) artist ": " title ": " album))))
 
 
