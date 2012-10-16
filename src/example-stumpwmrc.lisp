@@ -8,9 +8,6 @@
    "Concatenates strings"
    (apply 'concatenate 'string strings))
 
-;; My custom module for interacting with cmus... a work in progress.
-(load "/path/to/your/stumpwm-cmus.lisp")
-
 (set-contrib-dir "$HOME/sources/stumpwm/contrib")
 (set-prefix-key (kbd "F20"))
 (set-focus-color "#002e63")
@@ -109,6 +106,10 @@
 (define-key *root-map* (kbd "M-f") "dump-screen")
 (define-key *root-map* (kbd "M-r") "restore-frames")
 (define-key *root-map* (kbd "M") "cmus")
+
+
+;; My custom module for interacting with cmus... a work in progress.
+(load "~/path/to/my/stumpwm-cmus.lisp")
 
 ;;Cmus playback controls
 (define-key *root-map* (kbd "C-M-i") "cmus-info")
