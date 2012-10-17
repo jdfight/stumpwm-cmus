@@ -151,9 +151,9 @@
 
 (defcommand cmus-play-album (tag) ((:string "Enter Search: "))
   "Search and play album matching tag"
+  (cmus:cmus-control "--clear")
   (cmus:cmus-control "--raw 'view tree'")
   (cmus:cmus-control (cmus:cat "--raw ' /" tag "'"))
-  (cmus:cmus-control "--clear")
   (cmus:cmus-control "--raw win-add-p")
   (cmus:cmus-control "--next")
   (cmus:cmus-control "--raw 'view playlist'")
@@ -161,9 +161,9 @@
 
 (defcommand cmus-play-song (tag) ((:string "Enter Search: "))
   "Search and play song matching tag"
+  (cmus:cmus-control "--clear") 
   (cmus:cmus-control "--raw 'view tree'")
   (cmus:cmus-control (cmus:cat "--raw ' /" tag "'"))
-  (cmus:cmus-control "--clear")
   (cmus:cmus-control "--raw win-next")
   (cmus:cmus-control "--raw win-add-p")
   (cmus:cmus-control "--next")
@@ -175,4 +175,6 @@
    (let ((title  (cmus:query-cmus "title")) (artist  (cmus:query-cmus "artist")) (album (cmus:query-cmus "album"))) 
         (echo-string (current-screen) (cmus:cat "Now Playing: " '(#\NewLine) artist ": " title ": " album))))
 
-
+;; For some reason I need to 'initialize' cmus-control with a throw away command. Otherwise, the very first play-album command 
+;; doesn't queue the first album properly. This seems to be some sort of cmus-remote quirk - I am still investigating the issue.
+(cmus:cmus-control "-Q")
