@@ -93,7 +93,20 @@
 
 (in-package :stumpwm)
 
-(defcommand cmus-send (command) ((:string "Enter Command: "))
+;;Auto-completion funcitonality Thanks to Alexander Vynnyk from dswm.
+(defun strings-only (list)
+  (cond ((null (car list)) nil)
+        ((stringp (car list))
+         (cons (car list) (strings-only (cdr list))))
+        (t (strings-only (cdr list)))))
+
+(define-stumpwm-type :cmus (input prompt)
+  (or (argument-pop input)
+      (completing-read (current-screen)
+                       prompt
+                       (strings-only cmus:*cmus-commands*))))
+
+(defcommand cmus-send (command) ((:cmus "Enter Command: "))
    "Send control commands to cmus."
      (dolist (com cmus:*cmus-commands*)
        (if (equal command com)
