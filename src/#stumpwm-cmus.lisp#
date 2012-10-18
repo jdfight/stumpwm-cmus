@@ -93,6 +93,7 @@
    ;; COMMENT: this little line just echoes the executed command to stumpwm
    (stumpwm:echo-string (stumpwm:current-screen) command))
 
+
 (in-package :stumpwm)
 
 ;;Auto-completion funcitonality Thanks to Alexander Vynnyk from dswm.
@@ -177,7 +178,9 @@
    (let ((title  (cmus:query-cmus "title")) (artist  (cmus:query-cmus "artist")) (album (cmus:query-cmus "album"))) 
         (echo-string (current-screen) (cmus:cat "Now Playing: " '(#\NewLine) artist ": " title ": " album))))
 
+<<<<<<< HEAD
 ;; For some reason I need to 'initialize' cmus-control with a throw away command. Otherwise, the very first play-album command 
 ;; doesn't queue the first album properly. This seems to be some sort of cmus-remote quirk - I am still investigating the issue.
 (cmus:cmus-control "-Q")
-
+=======
+>>>>>>> 4c14438d89e6fda31cd144a8b9ea4a2ed351960e
