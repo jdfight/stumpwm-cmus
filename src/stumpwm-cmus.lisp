@@ -89,7 +89,9 @@
 
 (defun cmus-control (command)
    "sends a command to cmus via cmus-remote"
-   (stumpwm:run-shell-command (cat "cmus-remote " command)))
+   (stumpwm:run-shell-command (cat "cmus-remote " command))
+   ;; COMMENT: this little line just echoes the executed command to stumpwm
+   (stumpwm:echo-string (stumpwm:current-screen) command))
 
 (in-package :stumpwm)
 
