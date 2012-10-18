@@ -164,4 +164,3 @@
    (let ((title  (cmus:query-cmus "title")) (artist  (cmus:query-cmus "artist")) (album (cmus:query-cmus "album"))) 
         (echo-string (current-screen) (cmus:cat "Now Playing: " '(#\NewLine) artist ": " title ": " album))))
 
-
