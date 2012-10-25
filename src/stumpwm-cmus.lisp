@@ -66,6 +66,7 @@
            :cmus-control
            :*cmus-commands*
            :*cmus-playlist-directory*
+           :cmus-commander
            :query-cmus))
 
 (in-package #:cmus)
@@ -92,6 +93,10 @@
    (stumpwm:run-shell-command (cat "cmus-remote " command))
    ;; COMMENT: this little line just echoes the executed command to stumpwm
    (stumpwm:echo-string (stumpwm:current-screen) command))
+
+(defun cmus-commander (&rest forms)
+   "Executes a list of cmus commands"
+   (loop for f in forms do (cmus:cmus-control f)))
 
 (in-package :stumpwm)
 
@@ -152,26 +157,17 @@
  (cmus:cmus-control (cmus:cat "--raw ' /" tag "'")))
 
 (defcommand cmus-play-album (tag) ((:string "Enter Search: "))
-  "Search and play album matching tag"
-  (cmus:cmus-control "--clear")
-  (cmus:cmus-control "--raw 'view tree'")
-  (cmus:cmus-control (cmus:cat "--raw ' /" tag "'"))
-  (cmus:cmus-control "--raw win-add-p")
-  (cmus:cmus-control "--next")
-  (cmus:cmus-control "--raw 'view playlist'")
-  (cmus:cmus-control "--play"))
+   "Search and play album matching tag"
+   (cmus:cmus-commander
+        "--clear" "--raw 'view tree'" (cmus:cat "--raw '/" tag "'") 
+        "--raw win-add-p" "--next" "--raw 'view playlist'" "--play"))
 
 (defcommand cmus-play-song (tag) ((:string "Enter Search: "))
-  "Search and play song matching tag"
-  (cmus:cmus-control "--clear") 
-  (cmus:cmus-control "--raw 'view tree'")
-  (cmus:cmus-control (cmus:cat "--raw ' /" tag "'"))
-  (cmus:cmus-control "--raw win-next")
-  (cmus:cmus-control "--raw win-add-p")
-  (cmus:cmus-control "--next")
-  (cmus:cmus-control "--raw 'view playlist'")
-  (cmus:cmus-control "--play"))
-
+   "Search and play song matching tag"
+   (cmus:cmus-commander 
+       "--clear"  "--raw 'view tree'" (cmus:cat "--raw ' /" tag "'")  
+       "--raw win-next"  "--raw win-add-p" "--next" "--raw 'view playlist'" "--play"))
+  
 (defcommand cmus-info () ()
    "Print cmus info to screen"
    (let ((title  (cmus:query-cmus "title")) (artist  (cmus:query-cmus "artist")) (album (cmus:query-cmus "album"))) 
