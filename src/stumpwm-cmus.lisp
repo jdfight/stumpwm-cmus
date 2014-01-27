@@ -170,8 +170,11 @@
   
 (defcommand cmus-info () ()
    "Print cmus info to screen"
-   (let ((title  (cmus:query-cmus "title")) (artist  (cmus:query-cmus "artist")) (album (cmus:query-cmus "album"))) 
-        (echo-string (current-screen) (cmus:cat "Now Playing: " '(#\NewLine) artist ": " title ": " album))))
+   (let ((title (cmus:query-cmus "title"))
+	 (artist  (cmus:query-cmus "artist"))
+	 (album (cmus:query-cmus "album")))
+        (stumpwm:message
+	 (format nil "Now Playing:~%Artist: ~A ~%Title: ~A~%Album: ~A" artist title album))))
 
 ;; For some reason I need to 'initialize' cmus-control with a throw away command. Otherwise, the very first play-album command 
 ;; doesn't queue the first album properly. This seems to be some sort of cmus-remote quirk - I am still investigating the issue.
