@@ -84,8 +84,9 @@
 
 (defun query-cmus (tag)
    "Queries active cmus play session for matching tag"
-   (let ((cmus-command "cmus-remote -Q | grep 'tag ") cmus-result)
-     (setf cmus-result (stumpwm:run-shell-command (cat cmus-command tag " '") t))
+   (let* ((cmus-command "cmus-remote -Q | grep 'tag ")
+	  (cmus-result
+	   (stumpwm:run-shell-command (cat cmus-command tag " '") t)))
      (string-trim '(#\Newline) (string-left-trim (cat "tag " tag) cmus-result))))
 
 (defun cmus-control (command)
