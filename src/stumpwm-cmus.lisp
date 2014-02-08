@@ -168,14 +168,22 @@
    (cmus:cmus-commander 
        "--clear"  "--raw 'view tree'" (cmus:cat "--raw ' /" tag "'")  
        "--raw win-next"  "--raw win-add-p" "--next" "--raw 'view playlist'" "--play"))
-  
+
+(defun cmus::emptystringsp (strings)
+  "Return whether the list contains empty strings or not."
+  (some #'(lambda (x) (string= "" x)) strings))
+
 (defcommand cmus-info () ()
    "Print cmus info to screen"
    (let ((title (cmus:query-cmus "title"))
 	 (artist  (cmus:query-cmus "artist"))
-	 (album (cmus:query-cmus "album")))
-        (stumpwm:message
-	 (format nil "Now Playing:~%Artist: ~A ~%Title: ~A~%Album: ~A" artist title album))))
+	 (album (cmus:query-cmus "album"))
+	 (filename (cmus:query-cmus "file")))
+     (if (not (cmus::emptystringsp (list title artist album)))
+	 (stumpwm:message
+	  (format nil "Now Playing:~%Artist: ~A ~%Title: ~A~%Album: ~A" artist title album))
+	 (stumpwm:message
+	  (format nil "Now Playing:~%File: ~A" filename)))))
 
 ;; For some reason I need to 'initialize' cmus-control with a throw away command. Otherwise, the very first play-album command 
 ;; doesn't queue the first album properly. This seems to be some sort of cmus-remote quirk - I am still investigating the issue.
