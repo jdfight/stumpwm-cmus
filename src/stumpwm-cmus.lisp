@@ -107,7 +107,7 @@ quotes first."
 
 (defun tag-query (tag)
   "Run a cmus-query on a tag field"
-  (query-cmus (cat "'^tag " tag "'")))
+  (query-cmus (cat "'^tag " tag " '")))
 
 (in-package :stumpwm)
 
