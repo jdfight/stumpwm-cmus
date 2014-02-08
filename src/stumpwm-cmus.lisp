@@ -133,25 +133,25 @@ quotes first."
 (defcommand cmus-video () ()
    "Find videos on youtube matching currently playing song in cmus"
    ( stumpwm:run-shell-command (cmus:cat "surfraw youtube " 
-                            (cmus:query-cmus "artist") 
-                            (cmus:query-cmus "title"))))
+                            (cmus::tag-query "artist")
+                            (cmus::tag-query "title"))))
 
 (defcommand cmus-artist-video () ()
    "Find videos on youtube matching current artist in cmus"
    ( stumpwm:run-shell-command (cmus:cat "surfraw youtube " 
-                            (cmus:query-cmus "artist"))))
+                            (cmus::tag-query "artist"))))
 
 (defcommand cmus-artist-wiki () ()
    "Search wikipedia for current artist in cmus"
     ( stumpwm:run-shell-command (cmus:cat "surfraw wikipedia " 
-                            (cmus:query-cmus "artist") " '(band)'")))
+                            (cmus::tag-query "artist") " '(band)'")))
 
 (defcommand cmus-lyrics () ()
    "Search wikipedia for current artist in cmus"
     ( stumpwm:run-shell-command (cmus:cat "surfraw google  " 
-                            (cmus:query-cmus "artist") 
+                            (cmus::tag-query "artist")
                             " " 
-                            (cmus:query-cmus "title")
+                            (cmus::tag-query "title")
                             " lyrics")))
 
 (defcommand cmus-load-playlist (playlist) ((:string "Enter Filename: "))
