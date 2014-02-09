@@ -82,12 +82,14 @@
    "Concatenates strings"
    (apply 'concatenate 'string strings))
 
-(defun query-cmus (tag)
-   "Queries active cmus play session for matching tag"
-   (let* ((cmus-command "cmus-remote -Q | grep 'tag ")
+(defun query-cmus (query)
+   "Queries active cmus play session for matching status object.
+Note: If you want a query with two words, such as 'tag artist' you must enclose them in
+quotes first."
+   (let* ((cmus-command "cmus-remote -Q | grep ")
 	  (cmus-result
-	   (stumpwm:run-shell-command (cat cmus-command tag " '") t)))
-     (string-trim '(#\Newline) (string-left-trim (cat "tag " tag) cmus-result))))
+	   (stumpwm:run-shell-command (cat cmus-command query) t)))
+     (string-trim '(#\Newline) (string-left-trim (cat query " ") cmus-result))))
 
 (defun cmus-control (command)
    "sends a command to cmus via cmus-remote"
@@ -98,6 +100,14 @@
 (defun cmus-commander (&rest forms)
    "Executes a list of cmus commands"
    (loop for f in forms do (cmus:cmus-control f)))
+
+(defun emptystringsp (strings)
+  "Return whether the list contains empty strings or not."
+  (some #'(lambda (x) (string= "" x)) strings))
+
+(defun tag-query (tag)
+  "Run a cmus-query on a tag field"
+  (query-cmus (cat "'^tag " tag " '")))
 
 (in-package :stumpwm)
 
@@ -123,25 +133,25 @@
 (defcommand cmus-video () ()
    "Find videos on youtube matching currently playing song in cmus"
    ( stumpwm:run-shell-command (cmus:cat "surfraw youtube " 
-                            (cmus:query-cmus "artist") 
-                            (cmus:query-cmus "title"))))
+                            (cmus::tag-query "artist")
+                            (cmus::tag-query "title"))))
 
 (defcommand cmus-artist-video () ()
    "Find videos on youtube matching current artist in cmus"
    ( stumpwm:run-shell-command (cmus:cat "surfraw youtube " 
-                            (cmus:query-cmus "artist"))))
+                            (cmus::tag-query "artist"))))
 
 (defcommand cmus-artist-wiki () ()
    "Search wikipedia for current artist in cmus"
     ( stumpwm:run-shell-command (cmus:cat "surfraw wikipedia " 
-                            (cmus:query-cmus "artist") " '(band)'")))
+                            (cmus::tag-query "artist") " '(band)'")))
 
 (defcommand cmus-lyrics () ()
    "Search wikipedia for current artist in cmus"
     ( stumpwm:run-shell-command (cmus:cat "surfraw google  " 
-                            (cmus:query-cmus "artist") 
+                            (cmus::tag-query "artist")
                             " " 
-                            (cmus:query-cmus "title")
+                            (cmus::tag-query "title")
                             " lyrics")))
 
 (defcommand cmus-load-playlist (playlist) ((:string "Enter Filename: "))
@@ -168,14 +178,18 @@
    (cmus:cmus-commander 
        "--clear"  "--raw 'view tree'" (cmus:cat "--raw ' /" tag "'")  
        "--raw win-next"  "--raw win-add-p" "--next" "--raw 'view playlist'" "--play"))
-  
+
 (defcommand cmus-info () ()
    "Print cmus info to screen"
-   (let ((title (cmus:query-cmus "title"))
-	 (artist  (cmus:query-cmus "artist"))
-	 (album (cmus:query-cmus "album")))
-        (stumpwm:message
-	 (format nil "Now Playing:~%Artist: ~A ~%Title: ~A~%Album: ~A" artist title album))))
+   (let ((title (cmus::tag-query "title"))
+	 (artist  (cmus::tag-query "artist"))
+	 (album (cmus::tag-query "album"))
+	 (filename (cmus:query-cmus "file")))
+     (if (not (cmus::emptystringsp (list title artist album)))
+	 (stumpwm:message
+	  (format nil "Now Playing:~%Artist: ~A ~%Title: ~A~%Album: ~A" artist title album))
+	 (stumpwm:message
+	  (format nil "Now Playing:~%File: ~A" filename)))))
 
 ;; For some reason I need to 'initialize' cmus-control with a throw away command. Otherwise, the very first play-album command 
 ;; doesn't queue the first album properly. This seems to be some sort of cmus-remote quirk - I am still investigating the issue.
